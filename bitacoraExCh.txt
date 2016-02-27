@@ -1,0 +1,1053 @@
+
+Bitacora ExomeChip Project 2015
+
+#########################
+#	28.04.2015	#
+########################
+
+Today start to dowloading and working with the data from ExomeChip. 
+
+The data was dowloading from: http://ukshikmb-vw061.mucosalab.de:8080/AffySnpData/
+
+Using the chips: 
+  iScan HumanExome 12v1 chip build 37	-> for controls
+  iScan HumanExome 12v1.2 chip build 37	-> for Cases
+
+1248 cases and 7026 controls were downloaded. I use the id from excel sheets located in doc folder.
+
+The data was aqquared applying to plus stranded and plink file options. Giving us 4 files:
+  anno.txt
+  .bed
+  .bim
+  .fam
+
+However, the controls bed files don't oppen with plink v.1.07 so I process them with plink v.1.04 to get the original med and ped files (such controls as cases), using the following sentence:
+
+  plink104 --bfile ../data/controls_plink/controls_plusstrand_plink --out ../data/controls_raw/controls_plusstrand
+
+  plink104 --bfile ../data/cases_plink/cases_plusstrand_plink --out ../data/cases_raw/cases_plusstrand
+
+According to Plink first analysis, we got the following info:
+
+  244770 markers to be included from Cases
+  247870 markers to be included from Controls
+  
+Thats mean that we have tested some diferent SNPs markers between the two Group Samples. Therefore i going to do a python script "dataExpl.py" which will evaluate the markers composition and 
+tell us which are the same markers and which don't, using the SNP_ID_Name and Base-Pair_Position information stored in the MAP file, columns 2 and 4 from .map file. 
+
+At the end the the script has the option to change the info in the .map file in order to excude the SNPs from the analysis as the following:
+
+*** The following was take from plink web page: http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#ped ***
+
+To exclude a SNP from analysis, set the 4th column (physical base-pair position) to any negative value (this will only work for MAP files, not for binary BIM files).
+
+     1  rs123456  0  1234555
+     1  rs234567  0  1237793
+     1  rs224534  0  -1237697        <-- exclude this SNP
+     1  rs233556  0  1337456
+     ...
+
+The MAP file must therefore contain as many markers as are in the PED file. The markers in the PED file do not need to be in genomic order: (i.e. the order MAP file should align with the order of the PED file markers). 
+
+*** ---- ***
+
+
+Goto!
+#########################
+#	05.05.2015	#
+#########################
+
+The result of the data examination was: 3100 new markers, all in Control data.
+
+Goto!
+#########################
+#	07-08.05.2015	#
+#########################
+
+Today start to dowloading and working with the data from ExomeChip with zCalls. 
+
+The data was dowloading from: http://ukshikmb-vw061.mucosalab.de:8080/AffySnpData/
+
+Using the chips: 
+  iScan HumanExome 12v1 zCall chip build 37	-> for controls
+  iScan HumanExome 12v1.2 A zCall chip build 37	-> for Cases
+
+  1248(334 males, 914 females, 0 of unspecified sex) cases and 6941 controls (3607 males, 3334 females, 0 of unspecified sex) were downloaded. I use the id from excel sheets located in doc folder.
+
+The data was aqquared applying to plus stranded and plink file options. Giving us 4 files:
+  anno.txt
+  .bed
+  .bim
+  .fam
+
+Evoker files:
+  Just .fam files
+
+However, the controls bed files don't oppen with plink v.1.07 so I process them with plink v.1.04 to get the original med and ped files (such controls as cases), using the following sentence:
+
+  plink104 --bfile ~/Documents/Projects/ExomeChip/data/zcalls/controls/Controls_12v1_plusstrd_plink_zcall --recode12 --out ~/Documents/Projects/ExomeChip/data/zcalls/controls_raw/controls_12v1_plusstrd_plink_zcall --noweb
+
+  plink104 --bfile ../data/cases_plink/cases_plusstrand_plink --recode12 --out ../data/cases_raw/cases_plusstrand
+
+According to Plink first analysis, we got the following info:
+
+  244770 markers to be included from Cases
+  247870 markers to be included from Controls
+  
+Thats mean that we have tested some diferent SNPs markers between the two Group Samples. Therefore i going to do a python script "dataExpl.py" which will evaluate the markers composition and 
+tell us which are the same markers and which don't, using the SNP_ID_Name and Base-Pair_Position information stored in the MAP file, columns 2 and 4 from .map file. 
+
+At the end the the script has the option to change the info in the .map file in order to excude the SNPs from the analysis as the following:
+
+*** The following was take from plink web page: http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#ped ***
+
+Now i will merge the two files to work with one file with the following script:
+
+plink --file ./cases_raw/cases_12v1.2_plusstrd_plink_zcall --merge ./controls_raw/controls_12v1_plusstrd_plink_zcall.ped ./controls_raw/controls_12v1_plusstrd_plink_zcall.map --recode --out exomechipz --noweb
+
+Results:
+*****
+244770 (of 244770) markers to be included from [ ./cases_raw/cases_12v1.2_plusstrd_plink_zcall.map ]
+1248 individuals with nonmissing phenotypes; 1248 cases; 334 males, 914 females, and 0 of unspecified sex
+
+244770 (of 247870) markers to be merged from [ ./controls_raw/controls_12v1_plusstrd_plink_zcall.map ] Of these, 0 are new, 244770 already exist
+6941 individuals merged from [ ./controls_raw/controls_12v1_plusstrd_plink_zcall.ped ] Of these, 6941 were new, 0 were already in current data
+
+8189 individuals with nonmissing phenotypes
+Assuming a disease phenotype (1=unaff, 2=aff, 0=miss)
+Missing phenotype value is also -9
+1248 cases and 6941 controls
+Before frequency and genotyping pruning, there are 244770 SNPs
+8189 founders and 0 non-founders found
+83044 heterozygous haploid genotypes; set to missing
+
+*****
+
+
+I did the merge also for not zcall info... just the calls (/data/calls)
+
+plink --file ./cases_raw/cases_plusstrand --merge ./controls_raw/controls_plusstrand.ped ./controls_raw/controls_plusstrand.map --recode --out exomechip --noweb
+
+Results:
+*****
+244770 (of 244770) markers to be included from [ ./cases_raw/cases_plusstrand.map ]
+1248 individuals with nonmissing phenotypes; 1248 cases, 0 controls and 0 missing; 334 males, 914 females, and 0 of unspecified sex
+
+244770 (of 247870) markers to be merged from [ ./controls_raw/controls_plusstrand.map ]; Of these, 0 are new, 244770 already exist
+7026 individuals merged from [ ./controls_raw/controls_plusstrand.ped ]; Of these, 7026 were new, 0 were already in current data
+
+8274 individuals with nonmissing phenotypes
+Assuming a disease phenotype (1=unaff, 2=aff, 0=miss)
+Missing phenotype value is also -9
+1248 cases and 7026 controls
+Before frequency and genotyping pruning, there are 244770 SNPs
+8274 founders and 0 non-founders found
+78747 heterozygous haploid genotypes; set to missing
+Writing list of heterozygous haploid genotypes to [ exomechip.hh ]
+Total genotyping rate in remaining individuals is 0.997753
+*****
+
+For both data set, i start the PLINK QC treatment:
+
+°to -> BED-BIM-FAM ->
+**
+plink --file exomechipz --make-bed --out exomechipz --noweb
+plink --file exomechip --make-bed --out exomechip --noweb
+**
+
+°Gender mismatch ->
+**
+plink --noweb --bfile exomechipz --check-sex --out exomechipz
+plink --noweb --bfile exomechip --check-sex --out exomechip
+**
+
+°list of discordant sex data: 
+**
+grep PROBLEM exomechip.sexcheck > exomechip.sexprobs
+*48 exomechip.sexprobs
+Rscript ~/Bin/Gender.R exomechip.sexcheck genderprob.jpeg
+
+grep PROBLEM exomechipz.sexcheck > exomechipz.sexprobs
+*35 exomechipz.sexprobs
+Rscript ~/Bin/Gender.R exomechipz.sexcheck genderprobz.jpeg
+**
+To read the table:
+####
+     FID     Family ID
+     IID     Individual ID
+     PEDSEX  Sex as determined in pedigree file (1=male, 2=female)
+     SNPSEX  Sex as determined by X chromosome
+     STATUS  Displays "PROBLEM" or "OK" for each individual
+     F       The actual X chromosome inbreeding (homozygosity) estimate {{ When the homozygosity rate is more than 0.2 but less thatn 0.8, the genotype data are inconclusive regarding the sex of 
+	     an individual and these are marked in column 4 (SNPSEX) with a 0.}} 
+	   
+A PROBLEM arises if the two sexes do not match, or if the SNP data or pedigree data are ambiguous with regard to sex. A male call is made if F is more than 0.8; a femle call is made if F is less than 0.2. 
+####
+
+°Individuals with elevated missing data rates or outlying heterozygousity rate ->
+**
+plink --noweb --bfile exomechipz --missing --out exomechipz
+plink --noweb --bfile exomechip --missing --out exomechip
+
+Rscript Missing.r plink.imiss plink.lmiss output.jpeg
+**
+####
+     plink.imiss
+     plink.lmiss 
+
+which detail missingness by individual and by SNP (locus), respectively. For individuals, the format is:
+
+     FID                Family ID
+     IID                Individual ID
+     MISS_PHENO         Missing phenotype? (Y/N)
+     N_MISS             Number of missing SNPs
+     N_GENO             Number of non-obligatory missing genotypes
+     F_MISS             Proportion of missing SNPs
+
+For each SNP, the format is:
+
+     SNP                SNP identifier
+     CHR                Chromosome number
+     N_MISS             Number of individuals missing this SNP
+     N_GENO             Number of non-obligatory missing genotypes
+     F_MISS             Proportion of sample missing for this SNP
+####
+
+
+°Imbreeding coeficients
+**
+plink --noweb --bfile exomechipz --het --out exomechipz
+plink --noweb --bfile exomechip --het --out exomechip
+**
+
+####
+     plink.het
+
+which contains the fields, one row per person in the file:
+
+     FID       Family ID
+     IID       Individual ID
+     O(HOM)    Observed number of homozygotes
+     E(HOM)    Expected number of homozygotes
+     N(NM)     Number of non-missing genotypes
+     F         F inbreeding coefficient estimate
+
+This analysis will automatically skip haploid markers (male X and Y chromosome markers). 
+####
+
+
+
+
+Goto!
+#################################
+#	03.06.2015 - 13.07.205	#
+#################################
+
+I started the analysis again with the new zcall files so:
+
+#*@ Per-Individuals Quality Control @*#
+
+1) reformating files
+
+  plink104 --noweb --bfile cases_plk_ps_12v1zCall --recode --out casesz --make-bed 
+  plink104 --noweb --bfile controls_plk_ps_12v1zCall --recode --out controlsz --make-bed 
+
+New bed,bim,fam files to use with new plink program
+ 
+ Cases: 1237 cases:334 males, 903 females; 244770 markers
+ Controls: 6941 controls: 3607 males, 3334 females; 247870 markers
+ 
+2) Using the dataExpl.log file generated before I extract the snps using plink because its a new file but with the same snps. (I change a bit the dataExpl.log file, taking away all the info out of the table, also the table header)
+
+awk '{ print $4 }' dataExpl.log > snplst2del.txt
+
+plink --noweb --bfile controlsz --exclude snplst2del.txt --make-bed --out controlsgz
+
+  Controls markers = there are 244770 SNPs the same to the Cases.
+
+3) Mergin
+
+plink --bfile ./cases/casesz --bmerge ./controls/controlsgz.bed ./controls/controlsgz.bim ./controls/controlsgz.fam --recode --make-bed --out exomez --noweb
+
+  244770 markers to be merged from [ ./controls/controlsgz.bim ]
+  Of these, 0 are new, 244770 already exist in current data
+  
+  1237 cases, 6941 controls and 0 missing
+  3941 males, 4237 females
+
+## analysis by individuals ##
+
+4.1) Gender mismatch 
+
+plink --noweb --bfile exomez --check-sex --out exomez
+
+grep PROBLEM exomez.sexcheck > exomez.sexprobs
+
+awk '{ print $1 "\t" $2 }' exomez.sexprobs > sexproblst.txt
+
+Rscript ~/Documents/Projects/ExomeChip/bin/Gender.R exomez.sexcheck genderproblems.jpeg
+
+4.2) removing the problematic individuals
+
+plink --noweb --bfile exomez --remove sexproblst.txt --make-bed --out exomez.sex
+
+  34 individuals removed with
+  
+  1216 cases, 6928 controls and 0 missing
+  3928 males, 4216 females,
+
+5) individuals with missing snps rates or outlzing heterozygosity rate
+
+plink --noweb --bfile exomez.sex --missing --out exomez.sex
+
+plink --noweb --bfile exomez.sex --het --out exomez.sex
+  
+Rscript ~/Documents/Projects/ExomeChip/bin/imiss_het.r exomez.sex.imiss exomez.sex.het 4 0.01 exomez.sexSNPmiss.jpeg 
+
+5.2) Removing individuals that failed imiss-hetrate qc.
+
+plink --noweb --bfile exomez.sex --remove failed-imisshet-qc.txt --make-bed --out exomez.sex.imisshet
+
+  29 individuals removed
+  1210 cases, 6905 controls
+  3915 males, 4200 females
+  
+6.1) Changing SNP ids to use hapmap file for stratification. file provided by Sören
+
+##convert SNP_IDs to Chr:Position 
+
+awk '{print $2 "\t" "chr"$1":"$4}' exomez.sex.imisshet.bim > snpid_updated.txt
+
+plink --bfile exomez.sex.imisshet --update-map snpid_updated.txt --update-name --make-bed --out exomez.sex.imisshet.nameupd --noweb
+
+6.2) retrieve snp list from hapmap bfile then extracting sample snps using as reference the hapmap snplist generated previously
+
+plink --bfile ../hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19 --write-snplist --out hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19 --noweb  --allow-no-sex
+
+plink --bfile exomez.sex.imisshet.nameupd --extract hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19.snplist --make-bed --out exomez.sex.imisshet.nameupd.hapmap-snps --noweb  --allow-no-sex
+
+ *** WARNING *** DUPLICATE MARKERS FOUND ***
+ 
+duplicates.py exomez.sex.imisshet.nameupd.hapmap-snps.log
+
+plink --bfile exomez.sex.imisshet.nameupd --exclude duplicates.txt --make-bed --out exomez.sex.imisshet.nameupd --noweb		###**  THIS STEP COULD BE EXECUTED JUST AFTER NAME UPDATING  **###
+
+  *After frequency and genotyping pruning, there are 243955 SNPs
+
+plink --bfile exomez.sex.imisshet.nameupd --extract hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19.snplist --make-bed --out exomez.sex.imisshet.nameupd.hapmap-snps --noweb  --allow-no-sex
+  After frequency and genotyping pruning, there are 17268 SNPs
+
+plink --noweb --bfile exomez.sex.imisshet.nameupd.hapmap-snps --bmerge ../hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19.bed ../hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19.bim ../hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19.fam --make-bed --out exomez.s.ih.nu.hmpsnp.hmp3r2 --allow-no-sex
+  
+  Found 37 SNPs that do not match in terms of allele codes
+  Might include strand flips, although flipped A/T and C/G SNPs will be undetected)
+  Writing problem SNPs to [ exomez.s.ih.nu.hmpsnp.hmp3r2.missnp ]
+
+#to correct previously error:
+  
+plink --bfile exomez.sex.imisshet.nameupd.hapmap-snps --extract hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19.snplist --make-bed --out exomez.s.ih.nu.hmpsnps.flip --allow-no-sex --flip exomez.s.ih.nu.hmpsnp.hmp3r2.missnp --noweb  
+plink --noweb --bfile exomez.s.ih.nu.hmpsnps.flip --bmerge ../hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19.bed ../hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19.bim ../hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19.fam --make-bed --out exomez.s.ih.nu.hmpsnp.flip.hmp3r2 --allow-no-sex
+
+  Found 7 SNPs that do not match in terms of allele codes
+  Might include strand flips, although flipped A/T and C/G SNPs will be undetected)
+  Writing problem SNPs to [ exomez.s.ih.nu.hmpsnp.flip.hmp3r2.missnp ]
+
+## manually elimination of them from the file: hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19.snplist; lets do it again:
+
+plink --bfile exomez.sex.imisshet.nameupd.hapmap-snps --extract hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19.snplist --make-bed --out exomez.s.ih.nu.hmpsnps.flip --allow-no-sex --flip exomez.s.ih.nu.hmpsnp.hmp3r2.missnp --noweb  
+plink --noweb --bfile exomez.s.ih.nu.hmpsnps.flip --bmerge ../hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19.bed ../hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19.bim ../hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19.fam --make-bed --out exomez.s.ih.nu.hmpsnp.flip.hmp3r2 --allow-no-sex
+
+  # sucsesful execution!
+  there are 1012421 SNPs 8510 individuals
+  
+  File integrated by exomez good info and hapmap3r2 info. ready to be analysed by population structure.
+
+  #*** with hapmap3r2_short version file ***#
+  
+  in the last command there were included too many new SPNs just from hapmap samples, so i would take it away to reduce the computational time.
+  
+plink --bfile exomez.s.ih.nu.hmpsnps.flip --write-snplist --out exomez.s.ih.nu.hmpsnps.snplist --noweb  --allow-no-sex
+
+plink --noweb --bfile ../hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19 --extract exomez.s.ih.nu.hmpsnps.snplist.snplist --make-bed --out hapmap3r2_short --allow-no-sex
+
+plink --noweb --bfile exomez.s.ih.nu.hmpsnps.flip --bmerge hapmap3r2_short.bed hapmap3r2_short.bim hapmap3r2_short.fam --make-bed --out exomez.s.ih.nu.hmpsnp.flip.hmp3r2_short --allow-no-sex
+
+  
+  there are 17268 SNPs, 8510 individuals with non-missing status
+
+ 
+7) formating for Eigenstrata using "convertf" --> it doesn't work with bfiles..
+
+  # parameter file .. Doesn't work with bfiles :(  # So we use plink to recode to bam ped map files:
+  
+plink --bfile exomez.s.ih.nu.hmpsnp.flip.hmp3r2 --recode --out exomez.s.ih.nu.hmpsnp.flip.hmp3r2 --noweb  --allow-no-sex
+
+printf 'genotypename: exomez.s.ih.nu.hmpsnp.flip.hmp3r2.ped\nsnpname: exomez.s.ih.nu.hmpsnp.flip.hmp3r2.map\nindivname: exomez.s.ih.nu.hmpsnp.flip.hmp3r2.ped\noutputformat: EIGENSTRAT\ngenotypeoutname: exomezEigen.geno\nsnpoutname: exomezEigen.SNP\nindivoutname: exomezEigen.ind\nfamilynames: NO' > Parameter_Eigen.EIGENSTRAT
+
+convertf -p Parameter_Eigen.EIGENSTRAT > eigen.log
+
+###exomezEigen.SNP\nindivoutname: exomezEigen.ind\nfamilynames: NO' > Parameter_Eigen.EIGENSTRAT
+
+
+smartpca.perl -i exomezEigen.geno -a exomezEigen.SNP -b exomezEigen.ind -o exomezEigen_m0.pca -p exomezEigen_m0.plot -e exomezEigen_m0.eval -l exomezEigen_m0.pca.log -k 10 -t 10 -m 0
+
+Rscript ~/Documents/Projects/ExomeChip/bin/plotingPCA.r exomezEigen_m0.pca.evec
+
+#*** with hapmap3r2_short version file ***#
+
+plink --bfile exomez.s.ih.nu.hmpsnp.flip.hmp3r2_short --recode --out exomez.s.ih.nu.hmpsnp.flip.hmp3r2_short --noweb  --allow-no-sex
+
+smartpca.perl -i exomez.s.ih.nu.hmpsnp.flip.hmp3r2_short.bed -a exomez.s.ih.nu.hmpsnp.flip.hmp3r2_short
+
+printf 'genotypename: exomez.s.ih.nu.hmpsnp.flip.hmp3r2_short.ped\nsnpname: exomez.s.ih.nu.hmpsnp.flip.hmp3r2_short.map\nindivname: exomez.s.ih.nu.hmpsnp.flip.hmp3r2_short.ped\noutputformat: EIGENSTRAT\ngenotypeoutname: exomezs_short.eigenstratgeno\nsnpoutname: exomezs_short.snp\nindivoutname: exomezs_short.ind\nfamilynames: NO' > param_exomez_short_Estrata
+
+convertf -p param_exomez_short_Estrata > eigen.log
+
+
+mkdir pca_noexclusions
+
+smartpca.perl -i ../exomezs_short.eigenstratgeno -a ../exomezs_short.snp -b ../exomezs_short.ind -o exomez_short_m0.pca -p exomez_short_m0.plot -e exomez_short_m0.eval -l exomez_short_m0.pca.log -k 10 -t 10 -m 0
+
+Rscript ~/Documents/Projects/ExomeChip/bin/plotingPCA_sp.r exomez_short_m0.pca.evec
+
+cd ../
+
+smartpca.perl -i exomezs_short.eigenstratgeno -a exomezs_short.snp -b exomezs_short.ind -o exomez_short.pca -p exomez_short.plot -e exomez_short.eval -l exomez_short.pca.log -k 10 -t 10
+
+Rscript ~/Documents/Projects/ExomeChip/bin/plotingPCA_rmv.r exomez_short.pca.evec ./pca_noexclusions/exomez_short_m0.pca.evec failstrat.txt
+
+#** 217 individuals to remove
+
+awk '{print "0\t" $0}' failstrat.txt > failedstrat.txt
+
+plink --noweb --bfile exomez.sex.imisshet.nameupd --remove failedstrat.txt --make-bed --out exomez.sex.imisshet.nameupd.strat
+
+  * Starts with 8115 individuals and 243955 markers
+  * Ends with 79371 individuals and 1183 cases, 6715 controls
+
+8) Calculating the IBD score for duplicates identification
+
+*@ The method works better when only independent SNPs are included in the analysis, So first we are gonna exclude extendend linkage desequilibrium HLA region and SNPs withing a window of 50Kb.
+
+plink --bfile exomez.sex.imisshet.nameupd.strat --exclude ../high-LD-regions.txt --range --indep-pairwise 50 5 0.2 --out LD_exclude --noweb --allow-no-sex
+  * Starts with 243955 markers
+  * Excluding 8501 SNPs ends with 235454 SNPs
+
+plink1.9 --bfile exomez.sex.imisshet.nameupd.strat --extract LD_exclude.prune.in --genome --out exomez_sex_imisshet_nameupd_strat_IBD --allow-no-sex
+
+run-IBD-QC.pl ./exomez_sex_imisshet_nameupd_strat_IBD
+
+wc -l fail-IBD-QC.txt:
+  * 160 individuals fail-IBD-QC.txt
+  
+grep -c "AGI" fail-IBD-QC.txt
+  * 20 case individuals fail IBD test
+  * 140 control individuals fail IBD test
+  
+plink1.9 --bfile exomez.sex.imisshet.nameupd.strat --remove fail-IBD-QC.txt --make-bed --out exomez.sex.imisshet.nameupd.strat.ibd  
+  
+  * 243955 Markers
+  * 7898 people (3802 males, 4096 females)
+  * 7738 people remaining.
+  * 1163 are cases and 6575 are controls.
+  
+#*@ Per-Marker Quality Control @*#
+###**** SNPs QC***###
+
+9) Exclude SNPs with high missing rate removing all the snps with more than 3% of missiness
+
+plink1.9 --bfile exomez.sex.imisshet.nameupd.strat.ibd --missing --out exomez.sex.imisshet.nameupd.strat.ibd
+Rscript ~/Documents/Projects/ExomeChip/bin/SNPmissHist.r exomez.sex.imisshet.nameupd.strat.ibd.lmiss
+
+plink1.9 --bfile exomez.sex.imisshet.nameupd.strat.ibd --geno 0.03 --make-bed --out exomezIQCgeno
+
+  144 variants removed due to missing genotype data (--geno)
+
+10) HWE test to check for outliers. Hardy Weinberg Equilibrium principle stating that genetic variation in a population will remain constant from one generation to the next in the absence of disturbing factors.
+    Those SNPs out of this equilibrium would be indicator of potential genotyping error, population stratification or even actual association with the trait under study. This is one of the few ways to identify systematic
+    genopyping errors in unrelated individuals. (HWE is specific to a population, so this should be applied to data from participants of each race separately)
+    
+    *** Because PLINK doesn't perfom multiple test correction, a large portion of the significant SNPs are actually false postives. One should perfom a conservative multiple correction test such as the Bonferrony correction
+        Or chosse much more conservative P-value threshold like P < 1x10-5
+    ** this test is not appropiate for rare variants so we ensure perform it only on SNPs with MAF > 0.05 with the command (-maf 0.05)
+
+plink1.9 --bfile exomezIQCgeno --maf 0.05 --make-bed --out exomezIQCgeno_commons
+
+  216427 variants removed due to minor allele threshold(s)
+  
+  27384 variants and 7738 people pass filters and QC
+
+plink1.9 --bfile exomezIQCgeno_commons --hardy --out eexomezIQCgeno_commonsHWE_ALL
+
+Rscript ~/Documents/Projects/ExomeChip/bin/PlotHWE.R eexomezIQCgeno_commonsHWE_ALL.hwe
+
+
+9.1) The HWE tests performed earlier looks awary so i am going to make the test case and controls separately and also contrlos batch seperatelly:
+
+Cases:
+grep "AGI" exomezIQCgeno_commons.fam | awk '{print $1" "$2" 1"}'> cases.txt
+
+Controls:
+grep -v "AGI" exomezIQCgeno_commons.fam | awk '{print $1" "$2" 2"}' > controls.txt
+
+Batches:#
+grep -v "AGI" exomezIQCgeno_commons.fam | grep "HCDEBONN" | awk '{print $1" "$2" a"}' > HCDEBONN.txt
+grep -v "AGI" exomezIQCgeno_commons.fam | grep "HCDEKORA2" | awk '{print $1" "$2" b"}' > HCDEKORA2.txt
+grep -v "AGI" exomezIQCgeno_commons.fam | grep "HCDEMICK" | awk '{print $1" "$2" c"}' > HCDEMICK.txt
+grep -v "AGI" exomezIQCgeno_commons.fam | grep "HCGCON" | awk '{print $1" "$2" d"}' > HCGCON.txt
+grep -v "AGI" exomezIQCgeno_commons.fam | grep "HCPOPGEN" | awk '{print $1" "$2" e"}' > HCPOPGEN.txt
+
+cat cases.txt controls.txt > samples_file.txt
+cat cases.txt HCDEBONN.txt HCDEKORA2.txt HCDEMICK.txt HCGCON.txt HCPOPGEN.txt > batches_file.txt
+
+plink1.9 --bfile exomezIQCgeno_commons --filter samples_file.txt 1 --hardy --out eexomezIQCgeno_commonsHWE_Case
+plink1.9 --bfile exomezIQCgeno_commons --filter samples_file.txt 2 --hardy --out eexomezIQCgeno_commonsHWE_Control
+plink1.9 --bfile exomezIQCgeno_commons --filter batches_file.txt a --hardy --out eexomezIQCgeno_commonsHWE_HCDEBONN
+plink1.9 --bfile exomezIQCgeno_commons --filter batches_file.txt b --hardy --out eexomezIQCgeno_commonsHWE_HCDEKORA2
+plink1.9 --bfile exomezIQCgeno_commons --filter batches_file.txt c --hardy --out eexomezIQCgeno_commonsHWE_HCDEMICK
+plink1.9 --bfile exomezIQCgeno_commons --filter batches_file.txt d --hardy --out eexomezIQCgeno_commonsHWE_HCGCON
+plink1.9 --bfile exomezIQCgeno_commons --filter batches_file.txt e --hardy --out eexomezIQCgeno_commonsHWE_HCPOPGEN
+ 
+Rscript ~/Documents/Projects/ExomeChip/bin/qqPlotHWE_2.R eexomezIQCgeno_commonsHWE_ALL.hwe eexomezIQCgeno_commonsHWE_Case.hwe eexomezIQCgeno_commonsHWE_Control.hwe eexomezIQCgeno_commonsHWE_HCDEBONN.hwe eexomezIQCgeno_commonsHWE_HCDEKORA2.hwe eexomezIQCgeno_commonsHWE_HCDEMICK.hwe eexomezIQCgeno_commonsHWE_HCGCON.hwe eexomezIQCgeno_commonsHWE_HCPOPGEN.hwe 
+
+threshold 0.000000001
+SNP Fails: 
+  cases:
+    24
+  HCDEBONN
+    263
+  HCDEKORA2
+    116
+  HCDEMICK	http://ukshikmb-vw061.mucosalab.de/AffyData/9db9fd74-9201-47e5-8bcd-fbfafd4cc8d3/9db9fd74-9201-47e5-8bcd-fbfafd4cc8d3.html
+    29
+  HCGCON
+    12
+  HCPOPGEN
+    162
+
+  fails <- unique(fails) --> from this the controls share 23 SNPs with cases.
+    314 
+
+Check cluster plots of this SNPs
+
+* Getting the right ids:
+
+while IFS='' read -r line || [[ -n $line ]]; do     echo "$line"; done < "SNPs_fail_HWE.txt"
+
+snpid_updated.txt
+
+10)Test Markers for different genotype call reates between cases and controls
+
+**# test while IFS='' read -r line || [[ -n $line ]]; do grep "$line" snpid_updated.txt >> SNPs_fail_case_HWE_IDs.txt ; done < "SNPs_fail_HWE.txt"
+
+while IFS='' read -r line || [[ -n $line ]]; do grep "$line" snpid_updated.txt | awk '{print $1}' >> SNPs_fail_HWE_IDs.txt ; done < "SNPs_fail_HWE.txt"
+while IFS='' read -r line || [[ -n $line ]]; do grep "$line" snpid_updated.txt | awk '{print $1}' >> SNPs_fail_case_HWE_IDs.txt ; done < "SNPs_fail_case_HWE.txt"
+while IFS='' read -r line || [[ -n $line ]]; do grep "$line" snpid_updated.txt | awk '{print $1}' >> SNPs_fail_cntrls_HWE_IDs.txt ; done < "SNPs_fail_cntrls_HWE.txt"
+
+Downloading:
+
+wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/9db9fd74-9201-47e5-8bcd-fbfafd4cc8d3/9db9fd74-9201-47e5-8bcd-fbfafd4cc8d3.html
+wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/33dbbf0e-ac01-41f4-abf9-e590134ff5ff/33dbbf0e-ac01-41f4-abf9-e590134ff5ff.html
+...
+
+Doing the R selection of failing SNPs with new threshold 0.00001 --> threshold changed in R script
+
+Rscript ~/Documents/Projects/ExomeChip/bin/qqPlotHWE_2.R eexomezIQCgeno_commonsHWE_ALL.hwe eexomezIQCgeno_commonsHWE_Case.hwe eexomezIQCgeno_commonsHWE_Control.hwe eexomezIQCgeno_commonsHWE_HCDEBONN.hwe eexomezIQCgeno_commonsHWE_HCDEKORA2.hwe eexomezIQCgeno_commonsHWE_HCDEMICK.hwe eexomezIQCgeno_commonsHWE_HCGCON.hwe eexomezIQCgeno_commonsHWE_HCPOPGEN.hwe 
+
+while IFS='' read -r line || [[ -n $line ]]; do grep "$line" snpid_updated.txt | awk '{print $1}' >> SNPs_fail_HWE_5_IDs.txt ; done < "SNPs_fail_HWE_5.txt"
+while IFS='' read -r line || [[ -n $line ]]; do grep "$line" snpid_updated.txt | awk '{print $1}' >> SNPs_fail_case_HWE_5_IDs.txt ; done < "SNPs_fail_case_HWE_5.txt"
+while IFS='' read -r line || [[ -n $line ]]; do grep "$line" snpid_updated.txt | awk '{print $1}' >> SNPs_fail_cntrls_HWE_5_IDs.txt ; done < "SNPs_fail_cntrls_HWE_5.txt"
+
+All failed SNPs 425
+
+wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/f88eb9a4-29ae-4f2a-b9da-42ec9676755f/f88eb9a4-29ae-4f2a-b9da-42ec9676755f.html
+wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/8e7a3466-511d-4332-8a5e-bc49a7acf3c3/8e7a3466-511d-4332-8a5e-bc49a7acf3c3.html
+wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/47b69856-793a-4647-bf75-9bfe5cf73f69/47b69856-793a-4647-bf75-9bfe5cf73f69.html
+wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/46072bd7-d8b9-4bd9-a0fd-649116437efb/46072bd7-d8b9-4bd9-a0fd-649116437efb.html
+wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/aa1b0efb-ebcb-4e70-833b-d7219bfe5320/aa1b0efb-ebcb-4e70-833b-d7219bfe5320.html
+wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/8eb06a14-e44a-4da3-858c-d88ffdeb02b1/8eb06a14-e44a-4da3-858c-d88ffdeb02b1.html
+
+Goto!
+#########################
+#	01.09.2015	#
+#########################
+
+Working with no stratification exclusion -- Data for Annegret!!
+
+~/results/010915/
+
+from:
+  /data/zcall/exomez... files
+  
+
+#*@ Per-Individuals Quality Control @*#
+
+## analysis by individuals ##
+
+1) Gender mismatch 
+
+plink --noweb --bfile exomez --check-sex --out exomez
+
+grep PROBLEM exomez.sexcheck > exomez.sex_problems
+
+awk '{ print $1 "\t" $2 }' exomez.sex_problems > sex_problems.txt
+
+Rscript ~/Documents/Projects/ExomeChip/bin/Gender.R exomez.sexcheck exomz.genderproblems.jpeg
+
+2) removing the problematic individuals
+
+plink1.9 --bfile exomez --remove sex_problems.txt --make-bed --out exomez_sex
+
+  34 individuals removed with
+  
+  1216 cases, 6928 controls and 0 missing
+  3928 males, 4216 females,
+
+3) individuals with missing snps rates or outlzing heterozygosity rate
+
+plink1.9 --bfile exomez_sex --missing --out exomez_sex
+
+plink1.9 --bfile exomez_sex --het --out exomez_sex
+  
+Rscript ~/Documents/Projects/ExomeChip/bin/imiss_het.r exomez_sex.imiss exomez_sex.het 4 0.01 exomez_sex_SNPmiss.jpeg 
+
+4) Removing individuals that failed imiss-hetrate qc.
+
+plink1.9 --bfile exomez_sex --remove failed-imisshet-qc.txt --make-bed --out exomez_sex_imisshet
+
+  29 individuals removed
+  1210 cases, 6905 controls
+  3915 males, 4200 females
+  
+5) Changing SNP ids to use hapmap file for stratification. file provided by Sören
+
+##convert SNP_IDs to Chr:Position 
+
+awk '{print $2 "\t" "chr"$1":"$4}' exomez_sex_imisshet.bim > snpid_updated.txt
+
+plink1.9 --bfile exomez_sex_imisshet --update-map snpid_updated.txt --update-name --make-bed --out exomez_sex_imisshet_nameupd
+
+6) retrieve snp list from hapmap bfile then extracting sample snps using as reference the hapmap snplist generated previously
+
+plink1.9 --bfile ~/Documents/Projects/ExomeChip/data/hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19 --write-snplist --out hapmapSNPlist --allow-no-sex
+
+plink1.9 --bfile exomez_sex_imisshet_nameupd --extract hapmapSNPlist.snplist --make-bed --out exomez_sex_imisshet_nameupd_hapmap-snps --allow-no-sex
+
+ *** WARNING *** DUPLICATE MARKERS FOUND ***
+ 
+duplicates.py exomez_sex_imisshet_nameupd_hapmap-snps.log
+
+*** No duplicates !! *** 
+
+### NO STRATIFICATION ###
+  
+7) Calculating the IBD score for duplicates identification
+
+*@ The method works better when only independent SNPs are included in the analysis, So first we are gonna exclude extendend linkage desequilibrium HLA region and SNPs withing a window of 50Kb.
+
+plink1.9 --bfile exomez_sex_imisshet_nameupd --exclude ~/Documents/Projects/ExomeChip/data/high-LD-regions.txt --range --indep-pairwise 50 5 0.2 --out LD_exclude --allow-no-sex
+
+  *Pruning complete.  109664 of 236248 variants removed.
+
+plink1.9 --bfile exomez_sex_imisshet_nameupd --extract LD_exclude.prune.in --genome --out exomez_sex_imisshet_nameupd_IBD --allow-no-sex
+plink --noweb --bfile exomez_sex_imisshet_nameupd_IBD --missing --out exomez_sex_imisshet_nameupd_IBD
+
+run-IBD-QC.pl ./exomez_sex_imisshet_nameupd_IBD
+
+wc -l fail-IBD-QC.txt:
+  * 170 individuals fail-IBD-QC.txt
+  
+grep -c "AGI" fail-IBD-QC.txt
+  * 23 case individuals fail IBD test
+  * 147 control individuals fail IBD test
+  
+plink1.9 --bfile exomez_sex_imisshet_nameupd --remove fail-IBD-QC.txt --make-bed --out exomez_sex_imisshet_nameupd_ibd  
+  
+  * 244770 Markers
+  * 7945 people (3802 males, 4096 females)
+  * 7945 people remaining.
+  * 1187 are cases and 6758 are controls.
+  
+#*@ Per-Marker Quality Control @*#
+###**** SNPs QC***###
+
+9) Exclude SNPs with high missing rate removing all the snps with more than 3% of missiness
+
+plink1.9 --bfile exomez_sex_imisshet_nameupd_ibd --missing --out exomez_sex_imisshet_nameupd_ibd
+Rscript ~/Documents/Projects/ExomeChip/bin/SNPmissHist.r exomez_sex_imisshet_nameupd_ibd.lmiss
+
+plink1.9 --bfile exomez_sex_imisshet_nameupd_ibd --geno 0.03 --make-bed --out exomezIQCgeno
+
+  144 variants removed due to missing genotype data (--geno)
+  244624 variants
+
+10) HWE test to check for outliers. Hardy Weinberg Equilibrium principle stating that genetic variation in a population will remain constant from one generation to the next in the absence of disturbing factors.
+    Those SNPs out of this equilibrium would be indicator of potential genotyping error, population stratification or even actual association with the trait under study. This is one of the few ways to identify systematic
+    genopyping errors in unrelated individuals. (HWE is specific to a population, so this should be applied to data from participants of each race separately)
+    
+    *** Because PLINK doesn't perfom multiple test correction, a large portion of the significant SNPs are actually false postives. One should perfom a conservative multiple correction test such as the Bonferrony correction
+        Or chosse much more conservative P-value threshold like P < 1x10-5
+    ** this test is not appropiate for rare variants so we ensure perform it only on SNPs with MAF > 0.05 with the command (-maf 0.05)
+
+plink1.9 --bfile exomezIQCgeno --maf 0.05 --make-bed --out exomezIQCgeno_commons
+
+  216427 variants removed due to minor allele threshold(s)
+  
+  27384 variants and 7738 people pass filters and QC
+
+plink1.9 --bfile exomezIQCgeno_commons --hardy --out exomezIQCgeno_commonsHWE_ALL
+
+Rscript ~/Documents/Projects/SQM/bin/sqmfigs.r -w exomezIQCgeno_commonsHWE_ALL.hwe
+
+
+9.1) The HWE tests performed earlier looks awary so i am going to make the test case and controls separately and also contrlos batch seperatelly:
+
+#Cases:
+#grep "AGI" exomezIQCgeno_commons.fam | awk '{print $1" "$2" 1"}'> cases.txt
+
+#Controls:
+#grep -v "AGI" exomezIQCgeno_commons.fam | awk '{print $1" "$2" 2"}' > controls.txt
+
+
+plink1.9 --bfile exomezIQCgeno --filter-controls --make-bed --out exomezIQCgeno_controls
+plink1.9 --bfile exomezIQCgeno_controls --maf 0.05 --make-bed --out exomezIQCgeno_controls_commons
+plink1.9 --bfile exomezIQCgeno_controls_commons --hardy --out exomezIQCgeno_controls_commons
+
+Rscript ~/Documents/Projects/ExomeChip/bin/checkHWE.r exomezIQCgeno_controls_commons.hwe
+wc -l exomezIQCgeno_controls_commons.hwe_fails.txt
+  fails 413
+  6758 are controls & 27465 variants
+
+plink1.9 --bfile exomezIQCgeno_controls --exclude exomezIQCgeno_controls_commons.hwe_fails.txt --make-bed --out exomezIQC_MQC_controls
+  hwe fails = 413
+  markers: 244624
+  individuals = 6758 people (3504 males, 3254 females)
+
+plink1.9 --bfile exomezIQC_MQC_controls --maf 0.05 --make-bed --out exomezIQC_MQC_controls_commons
+plink1.9 --bfile exomezIQC_MQC_controls_commons --hardy --out exomezIQC_MQC_controls_commons
+
+Rscript ~/Documents/Projects/ExomeChip/bin/checkHWE.r exomezIQC_MQC_controls_commons.hwe
+
+
+10) test markers for different genotype call rates between cases and controls
+
+
+
+Goto!
+#########################
+#	02.16	QC	#
+# last update: 25.02.16 #
+#########################
+
+** The results will be placed on ~/Documents/Projects/ExomeChip/results/28_01_16
+
+** Getting the RAW data:
+
+* plink1.9 = plink version 1.9
+* plink104 = plink version 1.4
+* plink    = plink version 1.7
+
+Start everything from the begining.
+
+mkdir rawdata
+cd rawdata
+
+plink104 --bfile ~/Documents/Projects/ExomeChip/data/zcalls/controls/controls_plk_ps_12v1zCall --recode --out ./controls_12v1_plusstrd_zcall_rawdata --noweb
+
+plink104 --bfile ~/Documents/Projects/ExomeChip/data/zcalls/cases/cases_plk_ps_12v1zCall --recode --out ./cases_plusstrand_zcall_rawdata --noweb
+
+cases:   244770 SNPs
+controls 247870 SNPs
+
+dataExpl.py -1 cases_plusstrand_zcall_rawdata.map -2 controls_12v1_plusstrd_zcall_rawdata.map
+
+plink104 --file ./cases_plusstrand_zcall_rawdata --merge ./controls_12v1_plusstrd_zcall_rawdata.ped ./controls_12v1_plusstrd_zcall_rawdata.map --make-bed --out data
+
+awk '{print $2 "\t" "chr"$1":"$4}' data.bim > New_snp_ids.txt
+
+plink1.9 --bfile data --update-map New_snp_ids.txt --update-name --make-bed --out data.nid
+
+Rscript /home/torres/Documents/Projects/ExomeChip/bin/duplicates.R data.nid.bim
+
+# 815 duplicates.txt
+
+# extract duplicates:
+plink1.9 --bfile data.nid --exclude duplicates.txt --make-bed --out data.nid.unique
+
+# 243140 variants and 8178 people
+
+cd ..
+
+plink1.9 --bfile ./rawdata/data.nid.unique --make-bed --out ./data
+
+plink1.9 --bfile data --check-sex --out data
+
+grep PROBLEM data.sexcheck > data.sexprobs
+
+awk '{ print $1 "\t" $2 }' data.sexprobs > sexproblemlist.txt
+
+Rscript ~/Documents/Projects/ExomeChip/bin/Gender.R data.sexcheck 1_data_genderproblems.jpeg
+
+plink1.9 --bfile data --remove sexproblemlist.txt --make-bed --out data.sex
+
+plink1.9 --bfile data.sex --missing --het --out data.sex
+
+Rscript ~/Documents/Projects/ExomeChip/bin/imiss_het.r data.sex.imiss data.sex.het 4 0.01 2_data.sex_SNPmissing.jpeg
+
+plink1.9 --bfile data.sex --remove failed-imisshet-qc.txt --make-bed --out data.sex.misshet
+
+mv fail.imisshet fail_1.imisshet
+
+mv failed-imisshet-qc.txt failed-imisshet-qc_1.txt
+
+plink1.9 --bfile data.sex.misshet --missing --het --out data.sex.misshet
+
+Rscript ~/Documents/Projects/ExomeChip/bin/imiss_het.r data.sex.misshet.imiss data.sex.misshet.het 4.5 0.01 3_data.sex.misshet_mishetcheck.jpeg
+
+## Stratification ## 
+
+mkdir stratification
+cd stratification
+
+#inside stratification folder
+
+## Stratification with hapmap reference
+
+plink1.9 --bfile /home/torres/Documents/Projects/ExomeChip/data/hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19 --write-snplist --out ./SNPlist_hapmap_hg19
+
+plink1.9 --bfile ../data.sex.misshet --extract SNPlist_hapmap_hg19.snplist --make-bed --out data.hapmap_snps
+
+# 17229 variants and 8115 people, 1210 are cases and 6905 are controls, 3915 males, 4200 females
+
+plink1.9 --bfile data.hapmap_snps --write-snplist --out ./snps_shared
+
+plink1.9 --bfile /home/torres/Documents/Projects/ExomeChip/data/hapmap3r2_CEU.CHB.JPT.YRI.founders.no-at-cg-snps_hg19 --extract snps_shared.snplist --make-bed --out ./HAPMAP_sharedSNPs
+
+plink --noweb --bfile data.hapmap_snps --bmerge HAPMAP_sharedSNPs.bed HAPMAP_sharedSNPs.bim HAPMAP_sharedSNPs.fam --make-bed --out data_HAPMAP
+# Found 34 SNPs that do not match in terms of allele codes
+
+plink --noweb --bfile data.hapmap_snps --extract snps_shared.snplist --flip data_HAPMAP.missnp --make-bed --out data.hapmap_snps.flip
+
+plink --noweb --bfile data.hapmap_snps.flip --bmerge HAPMAP_sharedSNPs.bed HAPMAP_sharedSNPs.bim HAPMAP_sharedSNPs.fam --make-bed --out data_HAPMAP
+# Found 4 SNPs that do not match in terms of allele codes
+
+mv data_HAPMAP.missnp To_exclude.txt
+
+plink1.9 --bfile data.hapmap_snps.flip --exclude To_exclude.txt --make-bed --out data.hapmap_snps.flip
+
+plink1.9 --bfile HAPMAP_sharedSNPs --exclude To_exclude.txt --make-bed --out HAPMAP_sharedSNPs
+
+plink --noweb --bfile data.hapmap_snps.flip --bmerge HAPMAP_sharedSNPs.bed HAPMAP_sharedSNPs.bim HAPMAP_sharedSNPs.fam --make-bed --out data_HAPMAP
+
+plink1.9 --bfile data_HAPMAP --recode --out data_HAPMAP
+
+printf 'genotypename: data_HAPMAP.ped\nsnpname: data_HAPMAP.map\nindivname: data_HAPMAP.ped\noutputformat: EIGENSTRAT\ngenotypeoutname: data_HAPMAP.geno\nsnpoutname: data_HAPMAP.SNP\nindivoutname: data_HAPMAP.ind\nfamilynames: NO' > Parameter_Eigen_all.EIGENSTRAT
+
+convertf -p Parameter_Eigen_all.EIGENSTRAT > eigen.log
+
+smartpca.perl -i data_HAPMAP.geno -a data_HAPMAP.SNP -b data_HAPMAP.ind -o data_HAPMAP.pca -p data_HAPMAP.plot -e data_HAPMAP.eval -l data_HAPMAP.pca.log -k 10 -t 10 -m 0
+
+Rscript ~/Documents/Projects/ExomeChip/bin/plotingPCA.r data_HAPMAP.pca.evec
+
+
+plink1.9 --bfile data.hapmap_snps.flip --recode --out data.hapmap_snps.flip
+
+printf 'genotypename: data.hapmap_snps.flip.ped\nsnpname: data.hapmap_snps.flip.map\nindivname: data.hapmap_snps.flip.ped\noutputformat: EIGENSTRAT\ngenotypeoutname: data.hapmap_snps.flip.geno\nsnpoutname: data.hapmap_snps.flip.SNP\nindivoutname: data.hapmap_snps.flip.ind\nfamilynames: NO' > Parameter_Eigen_data.EIGENSTRAT
+
+convertf -p Parameter_Eigen_data.EIGENSTRAT > eigen_data.log
+
+smartpca.perl -i data.hapmap_snps.flip.geno -a data.hapmap_snps.flip.SNP -b data.hapmap_snps.flip.ind -o data.hapmap_snps.flip.pca -p data.hapmap_snps.flip.plot -e data.hapmap_snps.flip.eval -l data.hapmap_snps.flip.pca.log -k 10 -t 10 -m 0
+
+Rscript ~/Documents/Projects/ExomeChip/bin/plotingPCA.r data.hapmap_snps.flip.pca.evec
+
+# back prev. folder
+
+cd ..
+##
+
+## IBS ##
+mkdir IBS
+
+cd IBS
+
+## In IBS folder
+
+*@ For IBS works better when only independent SNPs are included in the analysis, So first we are gonna exclude extendend linkage desequilibrium HLA region and SNPs withing a window of 50Kb.
+
+plink1.9 --bfile ../data.sex.misshet --exclude /home/torres/Documents/Projects/ExomeChip/data/high-LD-regions.txt --range --indep-pairwise 50 5 0.2 --out H_LD_SNPs_toexclude
+
+plink1.9 --bfile ../data.sex.misshet --extract H_LD_SNPs_toexclude.prune.in --genome --out data_IBD
+
+plink1.9 --bfile ../data.sex.misshet --missing --out data.sex.misshet
+
+run-IBD-QC.pl data.sex.misshet.imiss data_IBD.genome
+
+wc -l fail-IBD-QC.txt
+  #* 171 individuals fail-IBD-QC.txt
+  
+grep -c "AGI" fail-IBD-QC.txt
+  #* 21 case individuals fail IBD test
+  #* 150 control individuals fail IBD test
+
+# Back to prev. folder
+
+##
+
+cd ..
+
+plink1.9 --bfile data.sex.misshet --remove ./IBS/fail-IBD-QC.txt --make-bed --out data.sex.misshet.ibs 
+
+  #* 243140 Markers
+  #* 8115 people (3915 males, 4200 females) "INPUT"
+  #* 7944 people remaining.		    "OUTPUT"
+  #* 1189 are cases and 6755 are controls.
+  
+#*@ Per-Marker Quality Control @*#
+###**** SNPs QC***###
+
+plink1.9 --bfile data.sex.misshet.ibs --missing --out data.iqc --allow-no-sex
+
+Rscript ~/Documents/Projects/ExomeChip/bin/SNPmissHist.r data.iqc.lmiss
+
+plink1.9 --bfile data.sex.misshet.ibs --test-missing --out data.iqc --allow-no-sex
+
+run-diffmiss-qc.pl data.iqc
+
+wc -l fail-diffmiss-qc.txt
+  #* 526 SNPs fail missing test (p<0.00001)
+ 
+plink1.9 --bfile data.sex.misshet.ibs --exclude fail-diffmiss-qc.txt --make-bed --out data.iqc.lmiss
+
+## HWE test - check for outliers
+
+## *** Because PLINK doesn't perfom multiple test correction, a large portion of the significant SNPs are actually false postives. One should perfom a conservative multiple correction test such as the Bonferrony correction
+        Or chosse much more conservative P-value threshold like P < 1x10-5
+## ** this test is not appropiate for rare variants so we ensure perform it only on SNPs with MAF > 0.05 with the command (-maf 0.05)
+
+mkdir HWE
+
+cd HWE
+
+# extra thing ## 
+
+plink1.9 --bfile ../data.iqc.lmiss --maf 0.1 --exclude /home/torres/Documents/Projects/ExomeChip/bin/ExonChipProcessing/extra_files/chr23_26_newIDs.txt --indep-pairwise 50 5 0.2 --out data.iqc.lmiss.indepSNP  
+plink1.9 --bfile ../data.iqc.lmiss --maf 0.05 --extract data.iqc.lmiss.indepSNP.prune.in --hardy --out data.iqc.lmiss.indepSNP.hardy
+Rscript /home/torres/Documents/Projects/ExomeChip/bin/PlotHWE.R data.iqc.lmiss.indepSNP.hardy.hwe	# This scripts generate fails-file where sps has hwe p < 1x10-5
+
+wc -l controls_HWE_fails.txt
+  #* 141 SNPs file HWE test
+
+cd ..
+
+plink1.9 --bfile data.iqc.lmiss --exclude ./HWE/controls_HWE_fails.txt --make-bed --out data.iqc.lmiss.hwe
+
+#* 242473 variants and 7944 people, 1189 are cases and 6755 are controls, 3798 males, 4146 females
+
+##
+
+## Heterozygosity and inbreeding outliers
+
+##* Low heterozygosity may indicate inbreeding, which can lead to reduce fitness of a population with many homozygous genotypes, and high heterozygosity may indicate contamination. 
+
+mkdir HET
+
+cd HET
+
+plink1.9 --bfile ../data.iqc.lmiss.hwe --maf 0.1 --exclude /home/torres/Documents/Projects/ExomeChip/bin/ExonChipProcessing/extra_files/chr23_26_newIDs.txt --indep-pairwise 50 5 0.2 --out data.iqc.lmiss.hwe.indepSNP
+  
+plink1.9 --bfile ../data.iqc.lmiss.hwe --extract data.iqc.lmiss.hwe.indepSNP.prune.in --het --out data.iqc.lmiss.hwe.indepSNP.het
+
+plink1.9 --bfile ../data.iqc.lmiss.hwe --het --out data.iqc.lmiss.hwe.het
+
+Rscript ~/Documents/Projects/ExomeChip/bin/ExonChipProcessing/PlotHeterozygosity.R data.iqc.lmiss.hwe.indepSNP.het.het
+
+Rscript ~/Documents/Projects/ExomeChip/bin/ExonChipProcessing/PlotHeterozygosity.R data.iqc.lmiss.hwe.het.het
+
+cd ..
+
+cd data_qced
+
+plink1.9 --bfile ../data.iqc.lmiss.hwe --make-bed --out Ageing_ExomeChip_QCed
+plink1.9 --bfile ../data.iqc.lmiss.hwe --freq --out Ageing_ExomeChip_QCed
+
+#* 242473 variants and 7944 people, 1189 are cases and 6755 are controls, 3798 males, 4146 females
+
+### End of Quality Control !!!  - finished 25.02.2016###
+ 
+Goto!
+#########################
+#	03.16	#
+#########################
+
+##	*Association*	##
+
+###
+#* Single Variant Test  *#
+###
+# path= /home/torres/Documents/Projects/ExomeChip/results/03_16_Assoc/singleVariant/
+
+# Update SNP IDs to RSids:
+#plink1.9 --bfile /home/torres/Documents/Projects/ExomeChip/results/02_16_QC/data_qced/Ageing_ExomeChip_QCed --update-map /home/torres/Documents/Projects/ExomeChip/results/02_16_QC/data_qced_Test/ChrPos_RS_IDs.txt --update-name --make-bed --out data
+
+plink1.9 --bfile /home/torres/Documents/Projects/ExomeChip/results/02_16_QC/data_qced/Ageing_ExomeChip_QCed --assoc
+
+wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/ab564ea8-b743-4903-a801-3aafe2c8ceec/ab564ea8-b743-4903-a801-3aafe2c8ceec.html
+wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/eeeb735c-033f-4d7e-a2d5-c5849b2e73e3/eeeb735c-033f-4d7e-a2d5-c5849b2e73e3.html
+
+
+
+###
+#* Gene based association analysis - SKAT-O  *#
+###
+# path= /home/torres/Documents/Projects/ExomeChip/results/03_16_Assoc/geneBased/
+
+
+# Update SNP IDs to RSids:
+plink1.9 --bfile data --update-map /home/torres/Documents/Projects/ExomeChip/results/02_16_QC/data_qced_Test/ChrPos_RS_IDs.txt --update-name --make-bed --out data
+
+# Select those SNPs that have a gene annotation, based on ensembl:
+plink1.9 --bfile data --extract /home/torres/Documents/Projects/ExomeChip/results/02_16_QC/data_qced/snps2assoc.txt --make-bed --out data
+
+# get the covariates file with assoc_main.r
+
+
+Goto!
+#########################
+#		#
+#########################
+
+Goto!
+#########################
+#		#
+#########################
+
+
+Goto!
+#########################
+#		#
+#########################
+
+Goto!
+#########################
+#		#
+#########################
+
+Goto!
+#########################
+#		#
+#########################
+
+Goto!
+######################### 
+#		#
+#########################
+
+Goto!
+#########################
+#		#
+#########################
+
+Goto!
+#########################
+#		#
+#########################
