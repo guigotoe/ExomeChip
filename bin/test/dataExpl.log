@@ -1,0 +1,87 @@
+The following summarizes all differences between the two map files:
+
+mapfile	idx	Chr	SNP_id	GDis	Pos
+cases	0	1	exm2268640	0	111111
+cases	2	1	exm2222222	0	865545
+cases	4	3	exm46	0	865625
+cases	6	4	exm4444444	0	444444
+cases	8	1	exm5555555	0	555555
+cases	10	6	exm60	0	666666
+cases	12	7	exm7777777	0	871159
+cases	14	8	exm8888888	0	888888
+cases	19	1	exm104	0	874714
+cases	24	1	exm151	0	878697
+cases	31	1	exm222	0	880160
+cases	37	1	exm249	0	880943
+cases	42	1	exm268	0	881894
+controls	0	1	exm2268640	0	762320
+controls	2	1	exm1916089	0	865545
+controls	4	1	exm46	0	865625
+controls	6	1	exm51	0	865662
+controls	8	1	exm55	0	865694
+controls	10	1	exm60	0	866429
+controls	12	1	exm67	0	871159
+controls	17	x9	exm9999999	0	999999
+controls	19	y9	exm2_9	0	292929
+controls	20	1	exm104	0	10101010
+controls	25	1	0	0	878697
+controls	32	1	exm222	0	0
+controls	38	1	0	0	880943
+controls	43	1	exm268	0	0
+
+Differences only by: SNP_id
+mapfile	idx	Chr	SNP_id	GDis	Pos
+cases	37	1	exm249	0	880943
+controls	38	1	0	0	880943
+cases	2	1	exm2222222	0	865545
+controls	2	1	exm1916089	0	865545
+cases	24	1	exm151	0	878697
+controls	25	1	0	0	878697
+
+Differences only by: Chr
+mapfile	idx	Chr	SNP_id	GDis	Pos
+cases	4	3	exm46	0	865625
+controls	4	1	exm46	0	865625
+
+Differences only by: Pos
+mapfile	idx	Chr	SNP_id	GDis	Pos
+cases	19	1	exm104	0	874714
+controls	20	1	exm104	0	10101010
+cases	0	1	exm2268640	0	111111
+controls	0	1	exm2268640	0	762320
+cases	42	1	exm268	0	881894
+controls	43	1	exm268	0	0
+cases	31	1	exm222	0	880160
+controls	32	1	exm222	0	0
+
+Differences both by: Chr & SNP_id
+mapfile	idx	Chr	SNP_id	GDis	Pos
+cases	12	7	exm7777777	0	871159
+controls	12	1	exm67	0	871159
+
+Differences both by: Chr & Pos
+mapfile	idx	Chr	SNP_id	GDis	Pos
+cases	10	6	exm60	0	666666
+controls	10	1	exm60	0	866429
+
+New Markers!:
+mapfile	idx	Chr	SNP_id	GDis	Pos
+cases	6	4	exm4444444	0	444444
+cases	8	1	exm5555555	0	555555
+cases	14	8	exm8888888	0	888888
+controls	6	1	exm51	0	865662
+controls	8	1	exm55	0	865694
+controls	17	x9	exm9999999	0	999999
+controls	19	y9	exm2_9	0	292929
+
+Diferences	Count
+Chr	1
+Chr & Pos	1
+Chr & SNP_id	1
+GDis	0
+New	7
+New-cases	3
+New-controls	4
+Pos	4
+SNP_id	3
+Shared	149
