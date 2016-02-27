@@ -984,15 +984,20 @@ Goto!
 ###
 #* Single Variant Test  *#
 ###
-# path= /home/torres/Documents/Projects/ExomeChip/results/03_16_Assoc/singleVariant/
+# path= /home/torres/Documents/Projects/ExomeChip/results/03_16_Assoc/singleVariant/filtering
 
 # Update SNP IDs to RSids:
 #plink1.9 --bfile /home/torres/Documents/Projects/ExomeChip/results/02_16_QC/data_qced/Ageing_ExomeChip_QCed --update-map /home/torres/Documents/Projects/ExomeChip/results/02_16_QC/data_qced_Test/ChrPos_RS_IDs.txt --update-name --make-bed --out data
 
-plink1.9 --bfile /home/torres/Documents/Projects/ExomeChip/results/02_16_QC/data_qced/Ageing_ExomeChip_QCed --assoc
+plink1.9 --bfile /home/torres/Documents/Projects/ExomeChip/results/02_16_QC/data_qced/Ageing_ExomeChip_QCed --assoc --out Ageing_ExomeChip_QCed
 
-wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/ab564ea8-b743-4903-a801-3aafe2c8ceec/ab564ea8-b743-4903-a801-3aafe2c8ceec.html
-wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/eeeb735c-033f-4d7e-a2d5-c5849b2e73e3/eeeb735c-033f-4d7e-a2d5-c5849b2e73e3.html
+# * generate snp list to check cluster plots
+# Using the chips: 
+#   iScan HumanExome 12v1 zCall chip build 37	-> for controls
+#   iScan HumanExome 12v1.2 A zCall chip build 37	-> for Cases
+
+wget -r --no-parent --cut-dirs=3 
+wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/4ac71c5c-0e52-4382-a801-64bf2f37201a/4ac71c5c-0e52-4382-a801-64bf2f37201a.html
 
 
 
