@@ -965,14 +965,33 @@ Rscript ~/Documents/Projects/ExomeChip/bin/ExonChipProcessing/PlotHeterozygosity
 
 cd ..
 
+cd clusPlot_filtering
+
+## single association
+plink1.9 --bfile ../data.iqc.lmiss.hwe.het --assoc --out Ageing_ExomeChip_QCed
+
+# * generate snp list to check cluster plots
+# Using the chips: 
+#   iScan HumanExome 12v1 zCall chip build 37	-> for controls
+#   iScan HumanExome 12v1.2 A zCall chip build 37	-> for Cases
+
+wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/59be7f1d-d6d1-4552-a892-a7a15566df13/59be7f1d-d6d1-4552-a892-a7a15566df13.html
+wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/4ac71c5c-0e52-4382-a801-64bf2f37201a/4ac71c5c-0e52-4382-a801-64bf2f37201a.html
+
+cd..
+
+# remove Cluster Plot fails:
+
+plink1.9 --bfile data.iqc.lmiss.hwe --exclude ./ClusPlot_filtering/fail_clusterplot.txt --make-bed --out data.iqc.lmiss.hwe.clp
+
 cd data_qced
 
-plink1.9 --bfile ../data.iqc.lmiss.hwe --make-bed --out Ageing_ExomeChip_QCed
-plink1.9 --bfile ../data.iqc.lmiss.hwe --freq --out Ageing_ExomeChip_QCed
+plink1.9 --bfile ../data.iqc.lmiss.hwe.clp --make-bed --out Ageing_ExomeChip_QCed
+plink1.9 --bfile ../data.iqc.lmiss.hwe.clp --freq --out Ageing_ExomeChip_QCed
 
-#* 242473 variants and 7944 people, 1189 are cases and 6755 are controls, 3798 males, 4146 females
+#* 241860 variants and 7944 people, 1189 are cases and 6755 are controls, 3798 males, 4146 females
 
-### End of Quality Control !!!  - finished 25.02.2016###
+### End of Quality Control !!!  - finished 29.02.2016###
  
 Goto!
 #########################
@@ -991,14 +1010,9 @@ Goto!
 
 plink1.9 --bfile /home/torres/Documents/Projects/ExomeChip/results/02_16_QC/data_qced/Ageing_ExomeChip_QCed --assoc --out Ageing_ExomeChip_QCed
 
-# * generate snp list to check cluster plots
-# Using the chips: 
-#   iScan HumanExome 12v1 zCall chip build 37	-> for controls
-#   iScan HumanExome 12v1.2 A zCall chip build 37	-> for Cases
+# Using GTCA
 
-wget -r --no-parent --cut-dirs=3 
-wget -r --no-parent --cut-dirs=3 http://ukshikmb-vw061.mucosalab.de/AffyData/4ac71c5c-0e52-4382-a801-64bf2f37201a/4ac71c5c-0e52-4382-a801-64bf2f37201a.html
-
+gcta64 --bfile /home/torres/Documents/Projects/ExomeChip/results/02_16_QC/data_qced/Ageing_ExomeChip_QCed --autosome --maf 0.01 --make-grm --out data --thread-num 6
 
 
 ###
@@ -1014,6 +1028,8 @@ plink1.9 --bfile data --update-map /home/torres/Documents/Projects/ExomeChip/res
 plink1.9 --bfile data --extract /home/torres/Documents/Projects/ExomeChip/results/02_16_QC/data_qced/snps2assoc.txt --make-bed --out data
 
 # get the covariates file with assoc_main.r
+
+
 
 
 Goto!
