@@ -1012,11 +1012,52 @@ plink1.9 --bfile /home/torres/Documents/Projects/ExomeChip/results/02_16_QC/data
 
 # Using GTCA
 
+# GCTA-GRM: calculating the genetic relationship matrix (GRM) from all the autosomal SNPs
+
 gcta64 --bfile /home/torres/Documents/Projects/ExomeChip/results/02_16_QC/data_qced/Ageing_ExomeChip_QCed --autosome --maf 0.01 --make-grm --out data --thread-num 6
 
+# to generate additional featuring files:
 
+awk '{if(match($2,/AGI.+/)){j="\t1"}else if(match($2,/HC.+/)){j="\t0"}print $0j}' data.grm.id > data.phen
+
+awk '{if(match($2,/_m_/)){j="\tM"}else if(match($2,/_f_/)){j="\tF"}print $0j}' data.grm.id > data.gxe
+
+## to Lena: awk '{if(match($2,/(64289298|Position)/)){j=$2}else{j="missing"}print j}' input.test.txt
+
+#* Getting 10 eigenvectors (through eigenstrat)
+
+gcta64  --grm data --pca 10 --out data 
+
+# GCTA-GREML analysis: estimating the variance explained by the SNPs
+# Just case and control
+
+gcta64  --reml  --grm-bin data  --pheno data.phen --out data_cc
+
+# 1 categorical environmental factor(s) (M/F), Assuming a disease phenotype for a case-control study
+
+gcta64  --reml  --grm-bin data  --pheno data.phen --gxe data.gxe --reml-lrt 2 --reml-no-constrain --out data_gxe
+
+# Reading quantitative covariates from [data.eigenvec]., Assuming a disease phenotype for a case-control study
+
+gcta64  --reml  --grm-bin data  --pheno data.phen --qcovar data.eigenvec --out data_q
+
+#  GCTA-MLMA: mixed linear model based association analysis
+
+gcta64 --mlma-loco --bfile /home/sukmb347/sukmb347/ExomeChip/results/data_qced/Ageing_ExomeChip_QCed --pheno data.phen --covar data.covar --qcovar data.eigenvec --out data_covar_loco --thread-num 8
+
+
+##############
+gcta64 --bfile ../data.iqc.lmiss.hwe --autosome --maf 0.01 --make-grm --out data --thread-num 8
+gcta64  --grm data --pca 10 --out data
+awk '{if(match($2,/AGI.+/)){j="\t1"}else if(match($2,/HC.+/)){j="\t0"}print $0j}' data.grm.id > data.phen
+awk '{if(match($2,/_m_/)){j="\tM"}else if(match($2,/_f_/)){j="\tF"}print $0j}' data.grm.id > data.gxe
+
+gcta64 --mlma-loco --bfile ../data.iqc.lmiss.hwe --pheno data.phen --covar data.gxe --qcovar data.eigenvec --out data_covar_loco --thread-num 8
+
+##############
 ###
-#* Gene based association analysis - SKAT-O  *#
+#* Gene based association analysis - SKAT-O  *#ls
+
 ###
 # path= /home/torres/Documents/Projects/ExomeChip/results/03_16_Assoc/geneBased/
 
